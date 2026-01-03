@@ -1,5 +1,5 @@
 """
-ASGI config for djangooo project.
+ASGI config for o project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
