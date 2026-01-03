@@ -123,5 +123,5 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['47.95.11.134', 'localhost', '127.0.0.1']
 DEBUG = False
