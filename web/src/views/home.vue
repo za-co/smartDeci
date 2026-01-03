@@ -30,7 +30,7 @@ export default {
         this.data = res.data
       })
   }
-}
+} 
 </script>
 
 <style>
