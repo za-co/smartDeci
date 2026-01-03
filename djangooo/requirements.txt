@@ -1,0 +1,4 @@
+django
+pymysql
+gunicorn
+django-cors-headers

@@ -1,0 +1,18 @@
+# Python 虚拟环境
+.venv/
+venv/
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Git 文件夹（本地仓库嵌套不要上传）
+.git/
+
+# Node.js 依赖
+node_modules/
+
+# npm & Vue 构建文件
+dist/

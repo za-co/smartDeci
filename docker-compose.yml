@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: smartd_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: smartddatabase
+      MYSQL_USER: smartd
+      MYSQL_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: 123456
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  backend:
+    build: ./backend
+    container_name: smartd_backend
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./web
+    container_name: smartd_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
