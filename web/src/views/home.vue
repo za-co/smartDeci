@@ -24,6 +24,7 @@ export default {
     }
   },
   mounted() {
+    // axios.get("http://127.0.0.1:8000/api/status/")
     axios.get("http://47.95.11.134:8000/api/status/")
       .then(res => {
         this.data = res.data
