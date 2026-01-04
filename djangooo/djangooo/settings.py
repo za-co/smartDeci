@@ -79,8 +79,8 @@ WSGI_APPLICATION = 'djangooo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'smartDdatabase',
-        'USER': 'smartD',
+        'NAME': 'smartddatabase',
+        'USER': 'smartd',
         'PASSWORD': '123456',
         # 'HOST': '127.0.0.1',
         'HOST': 'mysql',
