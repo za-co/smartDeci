@@ -3,3 +3,4 @@ pymysql
 gunicorn
 django-cors-headers
 cryptography    
+djangorestframework
