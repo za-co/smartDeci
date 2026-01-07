@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 const service = axios.create({
-//   baseURL: 'http://localhost:8000/api/', // 部署时改为你的云服务器IP
-    baseURL: '/api',
+  baseURL: 'http://localhost:8000/api/', // 部署时改为你的云服务器IP
+    // baseURL: '/api',
   timeout: 5000
 });
 

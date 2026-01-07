@@ -25,8 +25,34 @@
       <section class="panel list-panel">
         <div class="panel-header">
           <h3>环境评估实时报告</h3>
-          <span class="hint">点击行查看历史趋势</span>
+          <div class="header-actions">
+            <button class="btn-add" @click="showAddModal = true">+ 模拟录入</button>
+            <span class="hint">点击行查看历史趋势</span>
+          </div>
         </div>
+
+        <div v-if="showAddModal" class="modal-overlay">
+          <div class="modal-content glass">
+            <h3>手动模拟数据录入</h3>
+            <div class="form-group">
+              <label>选择传感器:</label>
+              <select v-model="formData.sensor_id">
+                <option v-for="s in farmReport.detail" :key="s.id" :value="s.id">{{ s.name }} ({{ s.location }})</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>监测数值:</label>
+              <input type="number" v-model="formData.value" step="0.1" placeholder="请输入数值">
+            </div>
+            <div class="modal-btns">
+              <button class="btn-cancel" @click="showAddModal = false">取消</button>
+              <button class="btn-confirm" @click="submitData" :disabled="submitting">
+                {{ submitting ? '提交中...' : '确认上传' }}
+              </button>
+            </div>
+          </div>
+        </div>
+        
         <div class="table-wrapper">
           <table class="status-table">
             <thead>
@@ -150,6 +176,49 @@ onMounted(fetchData);
 // 响应式图表
 window.addEventListener('resize', () => myChart?.resize());
 onUnmounted(() => window.removeEventListener('resize', () => myChart?.resize()));
+
+// --- 新增状态变量 ---
+const showAddModal = ref(false);
+const submitting = ref(false);
+const formData = ref({
+  sensor_id: null,
+  value: null
+});
+
+// --- 新增提交方法 ---
+const submitData = async () => {
+  if (!formData.value.sensor_id || formData.value.value === null) {
+    alert("请填写完整信息");
+    return;
+  }
+
+  submitting.value = true;
+  try {
+    // 构造后端需要的 payload 结构
+    const payload = {
+      sensor_id: formData.value.sensor_id,
+      readings: [
+        {
+          value: parseFloat(formData.value.value),
+          timestamp: new Date().toISOString() // 自动生成当前时间戳
+        }
+      ]
+    };
+
+    // 调用后端 @action(detail=False, methods=['post']) 定义的 upload_batch_data
+    await service.post('sensors/upload_batch_data/', payload);
+    
+    alert("数据上传成功！");
+    showAddModal.value = false;
+    formData.value.value = null; // 重置
+    fetchData(); // 刷新大屏数据
+  } catch (err) {
+    console.error("提交失败", err);
+    alert("提交失败：" + (err.response?.data?.error || "服务器错误"));
+  } finally {
+    submitting.value = false;
+  }
+};
 </script>
 
 <style scoped>
@@ -199,4 +268,20 @@ td { padding: 15px 20px; border-bottom: 1px solid #f9f9f9; }
 
 /* 图表容器 */
 .chart-container { flex: 1; padding: 20px; }
+
+/* 按钮样式 */
+.btn-add { background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-right: 10px; }
+.btn-add:hover { background: #2980b9; }
+
+/* 弹窗遮罩 */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.modal-content { background: white; padding: 30px; border-radius: 16px; width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+.form-group { margin-bottom: 20px; display: flex; flex-direction: column; }
+.form-group label { font-size: 14px; margin-bottom: 8px; color: #7f8c8d; }
+.form-group input, .form-group select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+
+.modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.btn-cancel { background: #eee; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; }
+.btn-confirm { background: #2ecc71; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; }
+.btn-confirm:disabled { background: #bdc3c7; }
 </style>

@@ -25,8 +25,8 @@ const handleLogin = async () => {
   loading.value = true; 
   try {
     // 2. 确保 URL 完全匹配（注意末尾斜杠）
-    const res = await axios.post('api/login/', form.value);
-    // const res = await axios.post('http://localhost:8000/api/login/', form.value);
+    // const res = await axios.post('api/login/', form.value);
+    const res = await axios.post('http://localhost:8000/api/login/', form.value);
     
     // 3. Django 默认不返回 res.data.code，直接判断 res.status 或数据内容
     if (res.status === 200) {

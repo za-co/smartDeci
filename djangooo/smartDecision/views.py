@@ -91,6 +91,37 @@ class SensorViewSet(viewsets.ModelViewSet):
                 "volatility": round(max(values) - min(values), 2) if values else 0 # 计算波动率
             }
         })
+    @action(detail=False, methods=['get'])
+    def smart_farm_report(self, request):
+        """
+        优化后的决策报告：采用加权扣分制
+        """
+        sensors = Sensor.objects.filter(is_active=True)
+        serializer = self.get_serializer(sensors, many=True)
+        report_data = serializer.data
+        
+        total_deduction = 0
+        alert_sensors_count = 0
+        
+        for sensor_data in report_data:
+            impact = sensor_data['current_status'].get('score_impact', 0)
+            if impact > 0:
+                total_deduction += impact
+                alert_sensors_count += 1
+        
+        # 基础分100，扣完为止
+        health_score = max(0, 100 - total_deduction)
+        
+        return Response({
+            "timestamp": timezone.now(),
+            "summary": {
+                "total_sensors": len(report_data),
+                "alert_sensors": alert_sensors_count,
+                "health_score": health_score,
+                "status_label": "优" if health_score >= 90 else "良" if health_score >= 70 else "差"
+            },
+            "detail": report_data
+        })
     
 # 2. 注册视图
 @api_view(['POST'])
