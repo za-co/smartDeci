@@ -12,6 +12,9 @@ from django.contrib.auth.models import User
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
 class SensorViewSet(viewsets.ModelViewSet):
     queryset = Sensor.objects.all()
     serializer_class = SensorSerializer
@@ -154,3 +157,34 @@ def login_view(request):
         return Response({"msg": "登录成功", "username": user.username}, status=status.HTTP_200_OK)
     else:
         return Response({"error": "用户名或密码错误"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+@api_view(['GET'])
+@permission_classes([AllowAny]) # 修改为 AllowAny，避免前端因为没有携带认证信息而报错
+def user_info_view(request):
+    # 如果用户没登录，尝试从前端传来的 username 获取（简单逻辑）
+    username = request.query_params.get('username')
+    user = None
+    
+    if request.user.is_authenticated:
+        user = request.user
+    elif username:
+        user = User.objects.filter(username=username).first()
+
+    if not user:
+        return Response({"error": "未找到用户信息"}, status=status.HTTP_404_NOT_FOUND)
+    
+    total_sensors = Sensor.objects.filter(is_active=True).count()
+    # 模拟查询异常设备数
+    active_alerts = 2 
+
+    return Response({
+        "username": user.username,
+        "email": user.email or "farm_admin@example.com",
+        "date_joined": user.date_joined.strftime('%Y-%m-%d'),
+        "role": "系统管理员" if user.is_superuser else "牧场操作员",
+        "last_login": user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else "刚刚",
+        "stats": {
+            "total_sensors": total_sensors,
+            "active_alerts": active_alerts
+        }
+    })

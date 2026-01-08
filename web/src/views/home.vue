@@ -284,4 +284,71 @@ td { padding: 15px 20px; border-bottom: 1px solid #f9f9f9; }
 .btn-cancel { background: #eee; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; }
 .btn-confirm { background: #2ecc71; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; }
 .btn-confirm:disabled { background: #bdc3c7; }
+
+/* 适配后的状态标签 */
+.badge {
+  display: inline-flex;    /* 使用 flex 布局让文字居中更稳 */
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;     /* 强制文字在一行，绝不换行 */
+  padding: 4px 12px;       /* 增加左右内边距，更美观 */
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+  flex-shrink: 0;          /* 防止在挤压时变形 */
+  min-width: fit-content;  /* 确保宽度适应文字内容 */
+}
+
+/* 容器背景动画 */
+.home-container {
+  min-height: 100vh;
+  padding: 25px;
+  font-family: 'Segoe UI', sans-serif;
+  /* 独立的背景动画：深蓝到深绿的缓慢交替 */
+  background: linear-gradient(125deg, #1a2a6c, #2a4858, #1d3321);
+  background-size: 300% 300%;
+  animation: homeMove 12s ease infinite;
+  position: relative;
+}
+
+@keyframes homeMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 关键：让所有面板变成半透明毛玻璃 */
+.panel {
+  background: rgba(255, 255, 255, 0.1) !important; /* 极低不透明度 */
+  backdrop-filter: blur(15px); /* 毛玻璃模糊 */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff; /* 确保暗背景下文字可读 */
+}
+
+/* 调整标题和表头颜色，适应暗色背景 */
+.title-area h1, .panel-header h3 { color: #ffffff; }
+.subtitle, .hint { color: rgba(255,255,255,0.7); }
+
+/* 表格行样式适配 */
+.status-table tr:hover { background: rgba(255, 255, 255, 0.1); }
+.status-table tr.active-row { background: rgba(52, 152, 219, 0.2); border-left: 4px solid #3498db; }
+th { background: rgba(0, 0, 0, 0.2); color: #fff; }
+td { border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: #fff; }
+.loc-name { color: #fff; }
+
+.home-container {
+  /* ... 原有代码 ... */
+  min-height: 100vh;
+  /* 增加顶部内边距：导航栏高度约64px + 20px 呼吸间距 */
+  padding-top: 84px !important; 
+  box-sizing: border-box; /* 确保 padding 不会撑大容器 */
+}
+
+/* 如果你的 dashboard-header 也有 margin，可以适当微调 */
+.dashboard-header {
+  margin-top: 10px; 
+}
+
 </style>
