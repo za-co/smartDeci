@@ -134,35 +134,52 @@ const renderChart = async (sensor) => {
     const res = await service.get(`sensors/${sensor.id}/high_frequency_analysis/`);
     const chartData = res.data.info.recent_readings;
 
-    const option = {
-      grid: { top: '15%', left: '5%', right: '5%', bottom: '10%', containLabel: true },
-      tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.7)', textColor: '#fff' },
-      xAxis: { 
-        type: 'category', 
-        data: chartData.map(d => new Date(d.timestamp).toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})),
-        axisLine: { lineStyle: { color: '#ddd' } }
+  const option = {
+    grid: { top: '15%', left: '5%', right: '5%', bottom: '10%', containLabel: true },
+    
+    // 1. 修改提示框文字颜色
+    tooltip: { 
+      trigger: 'axis', 
+      backgroundColor: 'rgba(0,0,0,0.7)', 
+      textStyle: { color: '#fff' } // 修正为 textStyle
+    },
+
+    xAxis: { 
+      type: 'category', 
+      data: chartData.map(d => new Date(d.timestamp).toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})),
+      // --- 关键修改：X轴文字颜色 ---
+      axisLabel: { color: 'rgba(255, 255, 255, 0.8)' }, 
+      axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.3)' } }
+    },
+
+    yAxis: { 
+      type: 'value', 
+      name: sensor.unit,
+      // --- 关键修改：Y轴文字和单位颜色 ---
+      nameTextStyle: { color: 'rgba(255, 255, 255, 0.8)' },
+      axisLabel: { color: 'rgba(255, 255, 255, 0.8)' },
+      // 修改网格线颜色，让它更淡一点，不要抢戏
+      splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)', type: 'dashed' } }
+    },
+
+    series: [{
+      name: sensor.name,
+      data: chartData.map(d => d.value),
+      type: 'line',
+      smooth: true,
+      symbol: 'circle',
+      symbolSize: 8,
+      // 修改折线阴影，增强发光感
+      lineStyle: { width: 3, shadowBlur: 10, shadowColor: 'rgba(52, 152, 219, 0.5)' },
+      areaStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: 'rgba(52, 152, 219, 0.4)' },
+          { offset: 1, color: 'rgba(52, 152, 219, 0)' }
+        ])
       },
-      yAxis: { 
-        type: 'value', 
-        name: sensor.unit,
-        splitLine: { lineStyle: { type: 'dashed' } }
-      },
-      series: [{
-        name: sensor.name,
-        data: chartData.map(d => d.value),
-        type: 'line',
-        smooth: true,
-        symbol: 'circle',
-        symbolSize: 8,
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(52, 152, 219, 0.5)' },
-            { offset: 1, color: 'rgba(52, 152, 219, 0)' }
-          ])
-        },
-        itemStyle: { color: '#3498db', borderWidth: 2 }
-      }]
-    };
+      itemStyle: { color: '#3498db', borderWidth: 2, borderColor: '#fff' }
+    }]
+  };
     
     if (!myChart) myChart = echarts.init(document.getElementById('chart'));
     myChart.setOption(option);
@@ -350,5 +367,6 @@ td { border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: #fff; }
 .dashboard-header {
   margin-top: 10px; 
 }
+
 
 </style>
